@@ -1,3 +1,5 @@
+require "stack_master"
+
 module StackMaster
   module ParameterResolvers
     class JsonParameterStoreResolver < Resolver
@@ -12,20 +14,23 @@ module StackMaster
         client = Aws::SSM::Client.new(
           region: @stack_definition.region
         )
-
-        parampath = value.partition('#').first
-        jmespath = value.partition('#').last
+        partition = partition_value(value)
 
         resp = client.get_parameters({
-          names: [parampath],
+          names: [partition[:parampath]],
           with_decryption: false,
         })
 
-        json = JSON.parse(resp.parameters[0].value)
-        result = JMESPath.search(jmespath, json)
-        puts "result = #{result}"
-        puts "json = #{json}"
-        result
+        parse_json(JSON.parse(resp.parameters[0].value), partition)
+      end
+
+      def parse_json(json, partition)
+        JMESPath.search(partition[:jmespath], json)
+      end
+
+      def partition_value(value)
+        partition = value.partition('#')
+        {parampath: partition.first, jmespath: partition.last}
       end
     end
   end
