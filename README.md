@@ -22,7 +22,26 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+If your parameter called `/aws/service/ecs/optimized-ami/amazon-linux/recommended` and you want to use the value of the `image_id` key. For example:
+
+```json
+{
+  "schema_version": 1,
+  "image_name": "amzn-ami-2017.09.l-amazon-ecs-optimized",
+  "image_id": "ami-2d386654"
+}
+```
+
+You use the `json_parameter_store_resolver` with the format `<parameter path>#<JMESPath>` where `#` is used to separate the two paths.
+
+Example:
+
+```json
+AmiId:
+  json_parameter_store_resolver: /aws/service/ecs/optimized-ami/amazon-linux/recommended#image_id
+```
+
+To get an introduction to jmespath go to [jmespath tutorial](http://jmespath.org/tutorial.html) 
 
 ## Development
 
