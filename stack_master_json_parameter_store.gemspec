@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.2"
   spec.add_dependency "stack_master", "~> 1.4"
   spec.add_dependency "jmespath", "~> 1.4"
+  spec.add_dependency "aws-sdk-ssm", "~> 1"
 end

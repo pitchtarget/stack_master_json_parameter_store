@@ -11,17 +11,16 @@ module StackMaster
       end
 
       def resolve(value)
-        client = Aws::SSM::Client.new(
-          region: @stack_definition.region
-        )
         partition = partition_value(value)
-
-        resp = client.get_parameters({
-          names: [partition[:parampath]],
-          with_decryption: false,
-        })
-
-        parse_json(JSON.parse(resp.parameters[0].value), partition)
+        begin
+          resp = ssm.get_parameter({
+            name: partition[:parampath],
+            with_decryption: false
+          })
+        rescue Aws::SSM::Errors::ParameterNotFound
+          raise StackMaster::ParameterResolvers::ParameterStore::ParameterNotFound, "Unable to find #{partition[:parampath]} in Parameter Store"
+        end
+        parse_json(JSON.parse(resp.parameter.value), partition)
       end
 
       def parse_json(json, partition)
@@ -31,6 +30,12 @@ module StackMaster
       def partition_value(value)
         partition = value.partition('#')
         {parampath: partition.first, jmespath: partition.last}
+      end
+
+      private
+
+      def ssm
+        @ssm ||= Aws::SSM::Client.new(region: @stack_definition.region)
       end
     end
   end
