@@ -9,3 +9,4 @@
 .rspec_status
 Gemfile.lock
 .byebug_history
+stack_master_json_parameter_store-*.gem
